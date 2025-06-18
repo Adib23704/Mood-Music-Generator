@@ -5,134 +5,6 @@ import { Play, Pause, ExternalLink, Clock, Heart, Download, Share2, Shuffle, Ski
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function PlaylistDisplay({ playlist, moodAnalysis }) {
-  const [currentlyPlaying, setCurrentlyPlaying] = useState(null);
-  const [likedTracks, setLikedTracks] = useState(new Set());
-  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
-  const [isShuffled, setIsShuffled] = useState(false);
-  const [volume, setVolume] = useState(0.5);
-  const [progress, setProgress] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const audioRef = useRef(null);
-
-  const playPreview = (track, index) => {
-    if (currentlyPlaying && currentlyPlaying.id === track.id) {
-      currentlyPlaying.audio.pause();
-      setCurrentlyPlaying(null);
-      return;
-    }
-
-    if (currentlyPlaying) {
-      currentlyPlaying.audio.pause();
-    }
-
-    if (track.preview_url) {
-      const audio = new Audio(track.preview_url);
-      audio.volume = volume;
-      audio.play();
-      setCurrentlyPlaying({ id: track.id, audio });
-      setCurrentTrackIndex(index);
-      audioRef.current = audio;
-
-      audio.ontimeupdate = () => {
-        setProgress(audio.currentTime);
-        setDuration(audio.duration);
-      };
-
-      audio.onended = () => {
-        setCurrentlyPlaying(null);
-        setProgress(0);
-        playNext();
-      };
-    }
-  };
-
-  const playNext = () => {
-    const nextIndex = isShuffled
-      ? Math.floor(Math.random() * playlist.tracks.length)
-      : (currentTrackIndex + 1) % playlist.tracks.length;
-
-    const nextTrack = playlist.tracks[nextIndex];
-    if (nextTrack?.preview_url) {
-      playPreview(nextTrack, nextIndex);
-    }
-  };
-
-  const playPrevious = () => {
-    const prevIndex = isShuffled
-      ? Math.floor(Math.random() * playlist.tracks.length)
-      : (currentTrackIndex - 1 + playlist.tracks.length) % playlist.tracks.length;
-
-    const prevTrack = playlist.tracks[prevIndex];
-    if (prevTrack?.preview_url) {
-      playPreview(prevTrack, prevIndex);
-    }
-  };
-
-  const toggleShuffle = () => {
-    setIsShuffled(!isShuffled);
-  };
-
-  const handleVolumeChange = (e) => {
-    const newVolume = parseFloat(e.target.value);
-    setVolume(newVolume);
-    if (currentlyPlaying?.audio) {
-      currentlyPlaying.audio.volume = newVolume;
-    }
-  };
-
-  const toggleLike = (trackId) => {
-    const newLikedTracks = new Set(likedTracks);
-    if (newLikedTracks.has(trackId)) {
-      newLikedTracks.delete(trackId);
-    } else {
-      newLikedTracks.add(trackId);
-    }
-    setLikedTracks(newLikedTracks);
-  };
-
-  const sharePlaylist = async () => {
-    const shareData = {
-      title: `My ${playlist.mood} Playlist - MoodTunes`,
-      text: `Check out this ${playlist.mood} playlist I generated with MoodTunes!`,
-      url: window.location.href
-    };
-
-    if (navigator.share) {
-      try {
-        await navigator.share(shareData);
-      } catch (err) {
-        console.log('Error sharing:', err);
-      }
-    } else {
-      // Fallback: copy to clipboard
-      navigator.clipboard.writeText(`${shareData.title}\n${shareData.text}\n${shareData.url}`);
-      alert('Playlist details copied to clipboard!');
-    }
-  };
-
-  const downloadPlaylist = () => {
-    const playlistData = {
-      mood: playlist.mood,
-      generated: new Date().toISOString(),
-      tracks: playlist.tracks.map(track => ({
-        name: track.name,
-        artist: track.artist,
-        album: track.album,
-        spotify_url: track.external_url
-      }))
-    };
-
-    const blob = new Blob([JSON.stringify(playlistData, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${playlist.mood}-playlist-${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
   const formatTime = (seconds) => {
     if (!seconds || isNaN(seconds)) return '0:00';
     const mins = Math.floor(seconds / 60);
@@ -268,107 +140,7 @@ export default function PlaylistDisplay({ playlist, moodAnalysis }) {
               {playlist.tracks.length} tracks • {formatTime(totalDuration / 1000)} total
             </p>
           </div>
-
-          <div className="flex items-center gap-3">
-            <motion.button
-              onClick={toggleShuffle}
-              className={`p-3 rounded-full transition-colors ${isShuffled ? 'bg-purple-100 text-purple-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Shuffle className="w-5 h-5" />
-            </motion.button>
-
-            <motion.button
-              onClick={sharePlaylist}
-              className="p-3 bg-blue-100 text-blue-600 hover:bg-blue-200 rounded-full transition-colors"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Share2 className="w-5 h-5" />
-            </motion.button>
-
-            <motion.button
-              onClick={downloadPlaylist}
-              className="p-3 bg-green-100 text-green-600 hover:bg-green-200 rounded-full transition-colors"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Download className="w-5 h-5" />
-            </motion.button>
-          </div>
         </div>
-
-        {/* Mini Player Controls */}
-        {currentlyPlaying && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-gray-50 rounded-lg p-4 mb-4"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-3">
-                <motion.button
-                  onClick={playPrevious}
-                  className="p-2 hover:bg-gray-200 rounded-full transition-colors"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <SkipBack className="w-4 h-4" />
-                </motion.button>
-
-                <motion.button
-                  onClick={() => {
-                    if (currentlyPlaying?.audio) {
-                      currentlyPlaying.audio.pause();
-                      setCurrentlyPlaying(null);
-                    }
-                  }}
-                  className="p-2 bg-purple-600 text-white hover:bg-purple-700 rounded-full transition-colors"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Pause className="w-4 h-4" />
-                </motion.button>
-
-                <motion.button
-                  onClick={playNext}
-                  className="p-2 hover:bg-gray-200 rounded-full transition-colors"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <SkipForward className="w-4 h-4" />
-                </motion.button>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Volume2 className="w-4 h-4 text-gray-600" />
-                <input
-                  type="range"
-                  min="0"
-                  max="1"
-                  step="0.1"
-                  value={volume}
-                  onChange={handleVolumeChange}
-                  className="w-20"
-                />
-              </div>
-            </div>
-
-            {/* Progress Bar */}
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <span>{formatTime(progress)}</span>
-              <div className="flex-1 bg-gray-200 rounded-full h-2">
-                <div
-                  className="bg-purple-600 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${duration ? (progress / duration) * 100 : 0}%` }}
-                ></div>
-              </div>
-              <span>{formatTime(duration)}</span>
-            </div>
-          </motion.div>
-        )}
       </div>
 
       {/* Tracks List */}
@@ -380,22 +152,11 @@ export default function PlaylistDisplay({ playlist, moodAnalysis }) {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.05 }}
-              className={`flex items-center p-4 hover:bg-gray-50 border-b border-gray-100 last:border-b-0 group transition-all ${currentlyPlaying?.id === track.id ? 'bg-purple-50 border-purple-200' : ''
-                }`}
+              className={'flex items-center p-4 hover:bg-gray-50 border-b border-gray-100 last:border-b-0 group transition-all'}
             >
               {/* Track Number / Playing Indicator */}
               <div className="w-8 text-center mr-4">
-                {currentlyPlaying?.id === track.id ? (
-                  <motion.div
-                    animate={{ scale: [1, 1.2, 1] }}
-                    transition={{ duration: 1, repeat: Infinity }}
-                    className="text-purple-600 font-bold"
-                  >
-                    ♪
-                  </motion.div>
-                ) : (
-                  <span className="text-gray-400 text-sm">{index + 1}</span>
-                )}
+                <span className="text-gray-400 text-sm">{index + 1}</span>
               </div>
 
               {/* Album Art */}
@@ -412,22 +173,6 @@ export default function PlaylistDisplay({ playlist, moodAnalysis }) {
                     <Music className="w-6 h-6 text-gray-400" />
                   </div>
                 )}
-
-                {/* Play Button Overlay */}
-                {track.preview_url && (
-                  <motion.button
-                    onClick={() => playPreview(track, index)}
-                    className="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    {currentlyPlaying?.id === track.id ? (
-                      <Pause className="w-6 h-6 text-white" />
-                    ) : (
-                      <Play className="w-6 h-6 text-white" />
-                    )}
-                  </motion.button>
-                )}
               </div>
 
               {/* Track Info */}
@@ -439,19 +184,6 @@ export default function PlaylistDisplay({ playlist, moodAnalysis }) {
                 <p className="text-sm text-gray-500 truncate">{track.album}</p>
               </div>
 
-              {/* Popularity Indicator */}
-              {track.popularity && (
-                <div className="mr-4 text-center">
-                  <div className="text-xs text-gray-500 mb-1">Popular</div>
-                  <div className="w-12 bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-green-500 h-2 rounded-full"
-                      style={{ width: `${track.popularity}%` }}
-                    ></div>
-                  </div>
-                </div>
-              )}
-
               {/* Duration */}
               <div className="flex items-center text-gray-500 text-sm mr-4">
                 <Clock className="w-4 h-4 mr-1" />
@@ -460,18 +192,6 @@ export default function PlaylistDisplay({ playlist, moodAnalysis }) {
 
               {/* Actions */}
               <div className="flex items-center gap-2">
-                <motion.button
-                  onClick={() => toggleLike(track.id)}
-                  className={`p-2 rounded-full transition-colors ${likedTracks.has(track.id)
-                      ? 'text-red-500 bg-red-50'
-                      : 'text-gray-400 hover:text-red-500 hover:bg-red-50'
-                    }`}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <Heart className={`w-5 h-5 ${likedTracks.has(track.id) ? 'fill-current' : ''}`} />
-                </motion.button>
-
                 <motion.a
                   href={track.external_url}
                   target="_blank"
@@ -495,8 +215,8 @@ export default function PlaylistDisplay({ playlist, moodAnalysis }) {
         transition={{ delay: 0.5 }}
         className="mt-6 bg-white/60 backdrop-blur-sm rounded-xl p-6"
       >
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Playlist Statistics</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">Playlist Statistics</h3>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-center">
           <div>
             <div className="text-2xl font-bold text-purple-600">{playlist.tracks.length}</div>
             <div className="text-sm text-gray-600">Tracks</div>
@@ -504,10 +224,6 @@ export default function PlaylistDisplay({ playlist, moodAnalysis }) {
           <div>
             <div className="text-2xl font-bold text-blue-600">{formatTime(totalDuration / 1000)}</div>
             <div className="text-sm text-gray-600">Duration</div>
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-green-600">{likedTracks.size}</div>
-            <div className="text-sm text-gray-600">Liked</div>
           </div>
           <div>
             <div className="text-2xl font-bold text-pink-600">
