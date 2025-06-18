@@ -2,6 +2,7 @@
 
 import { Music, Headphones, Heart } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 export default function Header() {
   return (
@@ -62,7 +63,7 @@ export default function Header() {
             animate={{ rotate: [0, 10, -10, 0] }}
             transition={{ duration: 2, repeat: Infinity }}
           >
-            <Music className="w-16 h-16 mr-4" />
+            <Image src="/logo.png" alt="MoodTunes Logo" width={64} height={64} className="mr-4" />
           </motion.div>
           <h1 className="text-5xl font-bold bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
             MoodTunes
