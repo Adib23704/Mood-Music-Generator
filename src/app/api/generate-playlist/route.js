@@ -11,10 +11,8 @@ export async function POST(request) {
     
     const accessToken = await getSpotifyAccessToken();
 
-    // Try enhanced mood search first
     let tracks = await getEnhancedMoodTracks(mood, accessToken, 25);
     
-    // Fallback to basic mood search if needed
     if (tracks.length < 15) {
       console.log('Using basic mood search fallback');
       const basicTracks = await getMoodBasedTracks(mood, accessToken, 25);

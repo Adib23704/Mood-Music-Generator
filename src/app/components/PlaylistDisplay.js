@@ -47,10 +47,10 @@ export default function PlaylistDisplay({ playlist, moodAnalysis }) {
   };
 
   const playNext = () => {
-    const nextIndex = isShuffled 
+    const nextIndex = isShuffled
       ? Math.floor(Math.random() * playlist.tracks.length)
       : (currentTrackIndex + 1) % playlist.tracks.length;
-    
+
     const nextTrack = playlist.tracks[nextIndex];
     if (nextTrack?.preview_url) {
       playPreview(nextTrack, nextIndex);
@@ -58,10 +58,10 @@ export default function PlaylistDisplay({ playlist, moodAnalysis }) {
   };
 
   const playPrevious = () => {
-    const prevIndex = isShuffled 
+    const prevIndex = isShuffled
       ? Math.floor(Math.random() * playlist.tracks.length)
       : (currentTrackIndex - 1 + playlist.tracks.length) % playlist.tracks.length;
-    
+
     const prevTrack = playlist.tracks[prevIndex];
     if (prevTrack?.preview_url) {
       playPreview(prevTrack, prevIndex);
@@ -194,27 +194,68 @@ export default function PlaylistDisplay({ playlist, moodAnalysis }) {
         >
           <div className="absolute inset-0 bg-black/10"></div>
           <div className="relative z-10">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="text-3xl font-bold mb-2 flex items-center gap-2">
                   {getMoodEmoji(moodAnalysis.mood)}
                   Detected Mood: {moodAnalysis.mood.charAt(0).toUpperCase() + moodAnalysis.mood.slice(1)}
+                  {moodAnalysis.secondaryMood && (
+                    <span className="text-lg opacity-75">
+                      + {moodAnalysis.secondaryMood}
+                    </span>
+                  )}
                 </h3>
-                <p className="opacity-90 text-lg">
-                  Confidence: {Math.round(moodAnalysis.confidence * 100)}%
-                </p>
+                <div className="space-y-2">
+                  <p className="opacity-90 text-lg">
+                    Confidence: {Math.round(moodAnalysis.confidence * 100)}% •
+                    Intensity: {moodAnalysis.intensity}/10
+                  </p>
+                  <p className="opacity-80 text-sm">
+                    {moodAnalysis.context}
+                  </p>
+                  {moodAnalysis.musicStyles && (
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      <span className="text-sm opacity-75">Music Styles:</span>
+                      {moodAnalysis.musicStyles.map((style, index) => (
+                        <span
+                          key={index}
+                          className="px-2 py-1 bg-white/20 rounded-full text-xs"
+                        >
+                          {style}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
+
+              <div className="text-right">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                  className="text-6xl opacity-20 mb-2"
+                >
+                  {getMoodEmoji(moodAnalysis.mood)}
+                </motion.div>
+                <div className="text-xs opacity-60">
+                  Powered by AI
+                </div>
+              </div>
+            </div>
+
+            {/* Confidence Bar */}
+            <div className="w-full bg-white/20 rounded-full h-2">
               <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                className="text-6xl opacity-20"
-              >
-                {getMoodEmoji(moodAnalysis.mood)}
-              </motion.div>
+                className="bg-white rounded-full h-2"
+                initial={{ width: 0 }}
+                animate={{ width: `${moodAnalysis.confidence * 100}%` }}
+                transition={{ duration: 1, delay: 0.5 }}
+              />
             </div>
           </div>
         </motion.div>
       )}
+
 
       {/* Playlist Header with Controls */}
       <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg p-6 mb-6">
@@ -227,19 +268,18 @@ export default function PlaylistDisplay({ playlist, moodAnalysis }) {
               {playlist.tracks.length} tracks • {formatTime(totalDuration / 1000)} total
             </p>
           </div>
-          
+
           <div className="flex items-center gap-3">
             <motion.button
               onClick={toggleShuffle}
-              className={`p-3 rounded-full transition-colors ${
-                isShuffled ? 'bg-purple-100 text-purple-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
+              className={`p-3 rounded-full transition-colors ${isShuffled ? 'bg-purple-100 text-purple-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
               <Shuffle className="w-5 h-5" />
             </motion.button>
-            
+
             <motion.button
               onClick={sharePlaylist}
               className="p-3 bg-blue-100 text-blue-600 hover:bg-blue-200 rounded-full transition-colors"
@@ -248,7 +288,7 @@ export default function PlaylistDisplay({ playlist, moodAnalysis }) {
             >
               <Share2 className="w-5 h-5" />
             </motion.button>
-            
+
             <motion.button
               onClick={downloadPlaylist}
               className="p-3 bg-green-100 text-green-600 hover:bg-green-200 rounded-full transition-colors"
@@ -277,7 +317,7 @@ export default function PlaylistDisplay({ playlist, moodAnalysis }) {
                 >
                   <SkipBack className="w-4 h-4" />
                 </motion.button>
-                
+
                 <motion.button
                   onClick={() => {
                     if (currentlyPlaying?.audio) {
@@ -291,7 +331,7 @@ export default function PlaylistDisplay({ playlist, moodAnalysis }) {
                 >
                   <Pause className="w-4 h-4" />
                 </motion.button>
-                
+
                 <motion.button
                   onClick={playNext}
                   className="p-2 hover:bg-gray-200 rounded-full transition-colors"
@@ -301,7 +341,7 @@ export default function PlaylistDisplay({ playlist, moodAnalysis }) {
                   <SkipForward className="w-4 h-4" />
                 </motion.button>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <Volume2 className="w-4 h-4 text-gray-600" />
                 <input
@@ -315,7 +355,7 @@ export default function PlaylistDisplay({ playlist, moodAnalysis }) {
                 />
               </div>
             </div>
-            
+
             {/* Progress Bar */}
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <span>{formatTime(progress)}</span>
@@ -340,9 +380,8 @@ export default function PlaylistDisplay({ playlist, moodAnalysis }) {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.05 }}
-              className={`flex items-center p-4 hover:bg-gray-50 border-b border-gray-100 last:border-b-0 group transition-all ${
-                currentlyPlaying?.id === track.id ? 'bg-purple-50 border-purple-200' : ''
-              }`}
+              className={`flex items-center p-4 hover:bg-gray-50 border-b border-gray-100 last:border-b-0 group transition-all ${currentlyPlaying?.id === track.id ? 'bg-purple-50 border-purple-200' : ''
+                }`}
             >
               {/* Track Number / Playing Indicator */}
               <div className="w-8 text-center mr-4">
@@ -373,7 +412,7 @@ export default function PlaylistDisplay({ playlist, moodAnalysis }) {
                     <Music className="w-6 h-6 text-gray-400" />
                   </div>
                 )}
-                
+
                 {/* Play Button Overlay */}
                 {track.preview_url && (
                   <motion.button
@@ -423,11 +462,10 @@ export default function PlaylistDisplay({ playlist, moodAnalysis }) {
               <div className="flex items-center gap-2">
                 <motion.button
                   onClick={() => toggleLike(track.id)}
-                  className={`p-2 rounded-full transition-colors ${
-                    likedTracks.has(track.id)
+                  className={`p-2 rounded-full transition-colors ${likedTracks.has(track.id)
                       ? 'text-red-500 bg-red-50'
                       : 'text-gray-400 hover:text-red-500 hover:bg-red-50'
-                  }`}
+                    }`}
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                 >

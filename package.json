@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@huggingface/inference": "^4.0.6",
     "autoprefixer": "^10.4.21",
     "axios": "^1.10.0",
     "framer-motion": "^12.18.1",

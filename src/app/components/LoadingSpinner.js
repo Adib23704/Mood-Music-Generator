@@ -8,21 +8,18 @@ export default function LoadingSpinner({ message = "Loading..." }) {
     <div className="flex flex-col items-center justify-center py-16">
       {/* Logo with Spinner */}
       <div className="relative w-32 h-32 mb-8">
-        {/* Outer Spinning Ring */}
         <motion.div
           className="absolute inset-0 border-4 border-purple-200 border-t-purple-600 rounded-full"
           animate={{ rotate: 360 }}
           transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
         />
 
-        {/* Inner Spinning Ring (Opposite Direction) */}
         <motion.div
           className="absolute inset-2 border-3 border-pink-200 border-b-pink-600 rounded-full"
           animate={{ rotate: -360 }}
           transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
         />
 
-        {/* Your Logo in Center */}
         <motion.div
           className="absolute inset-0 flex items-center justify-center"
           animate={{
@@ -37,7 +34,7 @@ export default function LoadingSpinner({ message = "Loading..." }) {
         >
           <div className="w-16 h-16 relative">
             <Image
-              src="/logo.png" // Adjust this path to match your logo file name
+              src="/logo.png"
               alt="MoodTunes Logo"
               fill
               className="object-contain"

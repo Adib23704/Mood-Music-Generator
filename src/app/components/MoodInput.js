@@ -11,7 +11,6 @@ export default function MoodInput({ onMoodSubmit, isLoading }) {
   const [recentMoods, setRecentMoods] = useState([]);
   const [currentSuggestions, setCurrentSuggestions] = useState([]);
 
-  // Expanded pool of mood inspiration prompts
   const moodPromptPool = [
     // Happy & Energetic
     "I'm feeling on top of the world today!",
@@ -114,19 +113,18 @@ export default function MoodInput({ onMoodSubmit, isLoading }) {
     "Give me music that enhances my flow state."
   ];
 
-  // Generate random suggestions on component mount and when refreshed
   const generateRandomSuggestions = () => {
     const shuffled = [...moodPromptPool].sort(() => 0.5 - Math.random());
     setCurrentSuggestions(shuffled.slice(0, 8));
   };
 
-  // Load recent moods and generate initial suggestions
   useEffect(() => {
     const saved = localStorage.getItem('recentMoods');
     if (saved) {
       setRecentMoods(JSON.parse(saved));
     }
     generateRandomSuggestions();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSubmit = (e) => {
