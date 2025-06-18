@@ -17,7 +17,6 @@ export function analyzeMood(text) {
   const lowerText = text.toLowerCase();
   const sentimentResult = sentiment.analyze(text);
 
-  // Check for specific mood keywords
   let detectedMood = 'happy'; // default
   let maxMatches = 0;
 

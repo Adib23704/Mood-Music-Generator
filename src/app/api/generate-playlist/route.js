@@ -8,11 +8,8 @@ export async function POST(request) {
     if (!mood) {
       return NextResponse.json({ error: 'Mood is required' }, { status: 400 });
     }
-
-    console.log('Generating playlist for mood:', mood);
     
     const accessToken = await getSpotifyAccessToken();
-    console.log('Successfully obtained access token');
 
     // Try enhanced mood search first
     let tracks = await getEnhancedMoodTracks(mood, accessToken, 25);
@@ -23,8 +20,6 @@ export async function POST(request) {
       const basicTracks = await getMoodBasedTracks(mood, accessToken, 25);
       tracks = [...tracks, ...basicTracks].slice(0, 25);
     }
-
-    console.log('Retrieved tracks for mood:', mood, 'Count:', tracks.length);
 
     if (tracks.length === 0) {
       return NextResponse.json({ 

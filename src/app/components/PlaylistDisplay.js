@@ -362,6 +362,7 @@ export default function PlaylistDisplay({ playlist, moodAnalysis }) {
               {/* Album Art */}
               <div className="relative w-16 h-16 mr-4 flex-shrink-0">
                 {track.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={track.image}
                     alt={track.album}

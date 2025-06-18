@@ -30,7 +30,6 @@ export async function getSpotifyAccessToken() {
   }
 }
 
-// New approach using only Search API with advanced mood strategies
 export async function getMoodBasedTracks(mood, accessToken, limit = 25) {
   const moodSearchStrategies = {
     happy: {
@@ -230,43 +229,32 @@ export async function getMoodBasedTracks(mood, accessToken, limit = 25) {
   const strategy = moodSearchStrategies[mood] || moodSearchStrategies.happy;
   let allTracks = [];
 
-  // Execute different search strategies
-  console.log(`Executing mood-based search for: ${mood}`);
-
-  // Primary mood queries
   for (const query of strategy.primaryQueries.slice(0, 2)) {
     const tracks = await searchSpotifyTracks(query, accessToken, 8);
     allTracks.push(...tracks);
   }
 
-  // Genre-specific queries
   for (const query of strategy.genreQueries.slice(0, 2)) {
     const tracks = await searchSpotifyTracks(query, accessToken, 6);
     allTracks.push(...tracks);
   }
 
-  // Artist-specific queries
   for (const query of strategy.artistQueries.slice(0, 2)) {
     const tracks = await searchSpotifyTracks(query, accessToken, 5);
     allTracks.push(...tracks);
   }
 
-  // Playlist-based queries
   for (const query of strategy.playlistQueries.slice(0, 1)) {
     const tracks = await searchSpotifyTracks(query, accessToken, 6);
     allTracks.push(...tracks);
   }
 
-  // Remove duplicates and apply basic filtering
   const uniqueTracks = removeDuplicateTracks(allTracks);
   const filteredTracks = applyBasicMoodFiltering(uniqueTracks, mood);
-  
-  console.log(`Found ${allTracks.length} total tracks, ${uniqueTracks.length} unique, returning ${Math.min(filteredTracks.length, limit)}`);
   
   return filteredTracks.slice(0, limit);
 }
 
-// Search Spotify tracks using the Search API
 async function searchSpotifyTracks(query, accessToken, limit) {
   try {
     const response = await fetch(
@@ -292,7 +280,6 @@ async function searchSpotifyTracks(query, accessToken, limit) {
   }
 }
 
-// Remove duplicate tracks based on track ID
 function removeDuplicateTracks(tracks) {
   const seen = new Set();
   return tracks.filter(track => {
@@ -304,7 +291,6 @@ function removeDuplicateTracks(tracks) {
   });
 }
 
-// Apply basic mood filtering based on track metadata
 function applyBasicMoodFiltering(tracks, mood) {
   // Filter based on track name, artist, and album keywords
   const moodKeywords = {
@@ -347,38 +333,31 @@ function applyBasicMoodFiltering(tracks, mood) {
   return tracks.filter(track => {
     const searchText = `${track.name} ${track.artists.map(a => a.name).join(' ')} ${track.album.name}`.toLowerCase();
     
-    // Check for excluded keywords first
     const hasExcluded = keywords.exclude.some(keyword => searchText.includes(keyword));
     if (hasExcluded) return false;
     
-    // Check for included keywords
     const hasIncluded = keywords.include.some(keyword => searchText.includes(keyword));
     
-    // For mood-specific searches, we're more lenient since the search query already targets the mood
     return hasIncluded || Math.random() > 0.3; // Keep 70% of tracks that don't have excluded keywords
   });
 }
 
-// Enhanced search with popularity and release date filtering
 export async function getEnhancedMoodTracks(mood, accessToken, limit = 25) {
   const currentYear = new Date().getFullYear();
   const recentYears = [currentYear, currentYear - 1, currentYear - 2];
   
   let allTracks = [];
   
-  // Get recent popular tracks for the mood
   for (const year of recentYears.slice(0, 2)) {
     const query = `${mood} year:${year}`;
     const tracks = await searchSpotifyTracks(query, accessToken, 10);
     allTracks.push(...tracks);
   }
   
-  // Get classic tracks for the mood
   const classicQuery = `${mood} year:2000-2020`;
   const classicTracks = await searchSpotifyTracks(classicQuery, accessToken, 10);
   allTracks.push(...classicTracks);
   
-  // Combine with regular mood search
   const regularTracks = await getMoodBasedTracks(mood, accessToken, 15);
   allTracks.push(...regularTracks);
   
