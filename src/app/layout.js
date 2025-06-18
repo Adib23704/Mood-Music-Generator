@@ -21,7 +21,7 @@ export const metadata = {
   },
   openGraph: {
     title: 'MoodTunes - AI-Powered Music for Every Mood',
-    description: 'Discover personalized music playlists based on your current mood using AI-powered sentiment analysis and Spotify integration.',
+    description: 'Discover personalized music playlists based on your current mood using AI-powered sentiment analysis and Spotify integration. Generate the perfect soundtrack for any feeling.',
     url: 'https://mood.adibdev.me',
     siteName: 'MoodTunes',
     images: [
@@ -38,7 +38,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'MoodTunes - AI-Powered Music for Every Mood',
-    description: 'Discover personalized music playlists based on your current mood using AI-powered sentiment analysis and Spotify integration.',
+    description: 'Discover personalized music playlists based on your current mood using AI-powered sentiment analysis and Spotify integration. Generate the perfect soundtrack for any feeling.',
     images: ['/images/cover-image.jpg'],
     creator: '@adib2374',
   },
@@ -65,7 +65,6 @@ export default function RootLayout({ children }) {
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
 
         <meta name="theme-color" content="#8b5cf6" />
-        <meta name="color-scheme" content="light dark" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
