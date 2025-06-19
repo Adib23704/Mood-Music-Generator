@@ -15,14 +15,14 @@ export const metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://mood.adibdev.me'),
+  metadataBase: new URL('https://moodtunes.adibdev.me'),
   alternates: {
     canonical: '/',
   },
   openGraph: {
     title: 'MoodTunes - AI-Powered Music for Every Mood',
     description: 'Discover personalized music playlists based on your current mood using AI-powered sentiment analysis and Spotify integration. Generate the perfect soundtrack for any feeling.',
-    url: 'https://mood.adibdev.me',
+    url: 'https://moodtunes.adibdev.me',
     siteName: 'MoodTunes',
     images: [
       {
@@ -106,7 +106,7 @@ export default function RootLayout({ children }) {
               "@type": "WebApplication",
               "name": "MoodTunes",
               "description": "Discover personalized music playlists based on your current mood using AI-powered sentiment analysis and Spotify integration. Generate the perfect soundtrack for any feeling.",
-              "url": "https://mood.adibdev.me",
+              "url": "https://moodtunes.adibdev.me",
               "applicationCategory": "MultimediaApplication",
               "operatingSystem": "Web Browser",
               "offers": {

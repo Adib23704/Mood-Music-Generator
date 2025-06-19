@@ -53,9 +53,8 @@ MoodTunes is a modern web application that generates personalized Spotify playli
    ```
    SPOTIFY_CLIENT_ID=your_spotify_client_id
    SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
+   
    HUGGINGFACE_API_KEY=your_huggingface_api_key
-   NEXTAUTH_URL=http://localhost:3000
-   NEXTAUTH_SECRET=your_random_secret_key
    ```
 
 4. **Run the development server:**
