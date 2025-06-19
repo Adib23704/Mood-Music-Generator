@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['i.scdn.co', 'mosaic.scdn.co'],
+    remotePatterns: ['i.scdn.co', 'mosaic.scdn.co'],
     formats: ['image/webp', 'image/avif'],
   },
   compress: true,
