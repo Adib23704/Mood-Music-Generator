@@ -4,6 +4,8 @@ MoodTunes is a modern web application that generates personalized Spotify playli
 
 ![MoodTunes Screenshot](./public/images/cover-image.jpg)
 
+### Live: https://moodtunes.adibdev.me/
+
 ---
 
 ## 🚀 Features
@@ -85,7 +87,7 @@ MoodTunes is a modern web application that generates personalized Spotify playli
 
 ## 📦 Deployment
 
-- Ready to deploy on [Vercel](https://vercel.com/) or any Next.js-compatible host.
+- One click deploy [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Adib23704/MoodTunes) or any Next.js-compatible host.
 - Includes PWA manifest and SEO meta tags for best discoverability.
 
 ---
